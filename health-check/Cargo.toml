@@ -1,0 +1,18 @@
+[package]
+name = "health-check"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+clap.workspace = true
+prost.workspace = true
+rand.workspace = true
+rand_core.workspace = true
+tokio.workspace = true
+tonic.workspace = true
+uuid.workspace = true
+pbkdf2.workspace = true
+tonic-prost.workspace = true
+
+[build-dependencies]
+tonic-prost-build.workspace = true
