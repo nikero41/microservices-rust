@@ -1,6 +1,6 @@
-use std::env;
 use authentication::auth_client::AuthClient;
 use authentication::{SignInRequest, SignOutRequest, SignUpRequest};
+use std::env;
 use tokio::time::{Duration, sleep};
 use tonic::Request;
 use uuid::Uuid;
@@ -26,7 +26,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let response = client.sign_up(request).await?.into_inner();
         println!("SIGN UP RESPONSE STATUS: {:?}", response.status_code());
 
-        let request = Request::new(SignInRequest { username, password }); // Create a new `SignInRequest`.
+        let request = Request::new(SignInRequest { username, password });
         let response = client.sign_in(request).await?.into_inner();
         println!("SIGN IN RESPONSE STATUS: {:?}", response.status_code());
 
