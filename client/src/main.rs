@@ -16,7 +16,7 @@ pub mod authentication {
 #[command(version, about, long_about = None)]
 struct Cli {
     #[command(subcommand)]
-    command: Option<Commands>,
+    command: Commands,
 }
 
 #[derive(Subcommand)]
@@ -50,36 +50,32 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
 
     match &cli.command {
-        Some(Commands::SignIn { username, password }) => {
+        Commands::SignIn { username, password } => {
             let request = Request::new(SignInRequest {
                 username: username.to_owned(),
                 password: password.to_owned(),
             });
 
             let response = client.sign_in(request).await?.into_inner();
-
             println!("{:?}", response);
         }
-        Some(Commands::SignUp { username, password }) => {
+        Commands::SignUp { username, password } => {
             let request = Request::new(SignUpRequest {
                 username: username.to_owned(),
                 password: password.to_owned(),
             });
 
             let response = client.sign_up(request).await?;
-
             println!("{:?}", response.into_inner());
         }
-        Some(Commands::SignOut { session_token }) => {
+        Commands::SignOut { session_token } => {
             let request: Request<SignOutRequest> = Request::new(SignOutRequest {
                 session_token: session_token.to_owned(),
             });
 
             let response: Response<SignOutResponse> = client.sign_out(request).await?;
-
             println!("{:?}", response.into_inner());
         }
-        None => {}
     }
 
     Ok(())
