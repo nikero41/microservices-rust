@@ -11,9 +11,10 @@ pub mod authentication {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let auth_hostname = env::var("AUTH_SERVICE_HOST_NAME").unwrap_or("[::0]".to_owned());
+    let auth_host = env::var("AUTH_SERVICE_HOST_NAME").unwrap_or("[::0]".to_owned());
+    let auth_port = env::var("AUTH_SERVICE_HOST").unwrap_or("50051".to_owned());
 
-    let mut client = AuthClient::connect(format!("http://{}:50051", auth_hostname)).await?;
+    let mut client = AuthClient::connect(format!("http://{}:{}", auth_host, auth_port)).await?;
 
     loop {
         let username = Uuid::new_v4().to_string();
