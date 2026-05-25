@@ -41,9 +41,8 @@ impl Auth for AuthService {
         &self,
         request: Request<SignInRequest>,
     ) -> Result<Response<SignInResponse>, Status> {
-        println!("Got a request: {:?}", request);
-
         let request = request.into_inner();
+        println!("SIGN-IN: {}", request.username);
 
         let result = self
             .users_service
@@ -72,9 +71,8 @@ impl Auth for AuthService {
         &self,
         request: Request<SignUpRequest>,
     ) -> Result<Response<SignUpResponse>, Status> {
-        println!("Got a request: {:?}", request);
-
         let request = request.into_inner();
+        println!("SIGN-UP: {}", request.username);
 
         let result = self
             .users_service
@@ -111,9 +109,8 @@ impl Auth for AuthService {
         &self,
         request: Request<SignOutRequest>,
     ) -> Result<Response<SignOutResponse>, Status> {
-        println!("Got a request: {:?}", request);
-
         let req = request.into_inner();
+        println!("SIGN-OUT");
 
         self.sessions_service
             .lock()
