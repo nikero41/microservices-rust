@@ -51,12 +51,8 @@ impl Auth for AuthService {
             .get_user_uuid(&req.username, &req.password);
 
         match result {
-            Some(user_uuid) => {
-                let session_token = self
-                    .sessions_service
-                    .lock()
-                    .unwrap()
-                    .create_session(&user_uuid);
+            Ok(user_uuid) => {
+                let session_token = self.sessions_service.lock().unwrap().create(&user_uuid);
 
                 Ok(Response::new(SignInResponse {
                     status_code: StatusCode::Success.into(),
@@ -116,7 +112,7 @@ impl Auth for AuthService {
         self.sessions_service
             .lock()
             .unwrap()
-            .delete_session(&req.session_token);
+            .delete(&req.session_token);
 
         Ok(Response::new(SignOutResponse {
             status_code: StatusCode::Success.into(),

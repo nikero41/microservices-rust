@@ -3,8 +3,8 @@ use std::collections::HashMap;
 use uuid::Uuid;
 
 pub trait Sessions {
-    fn create_session(&mut self, user_uuid: &str) -> String;
-    fn delete_session(&mut self, user_uuid: &str);
+    fn create(&mut self, user_uuid: &str) -> String;
+    fn delete(&mut self, user_uuid: &str);
 }
 
 #[derive(Default)]
@@ -13,8 +13,8 @@ pub struct SessionsImpl {
 }
 
 impl Sessions for SessionsImpl {
-    fn create_session(&mut self, user_uuid: &str) -> String {
-        let session = Uuid::new_v4(); // Create a new session using Uuid::new_v4().
+    fn create(&mut self, user_uuid: &str) -> String {
+        let session = Uuid::new_v4();
 
         self.uuid_to_session
             .insert(user_uuid.to_string(), session.to_string());
@@ -22,7 +22,7 @@ impl Sessions for SessionsImpl {
         session.to_string()
     }
 
-    fn delete_session(&mut self, user_uuid: &str) {
+    fn delete(&mut self, user_uuid: &str) {
         if self.uuid_to_session.contains_key(user_uuid) {
         self.uuid_to_session.remove(user_uuid);
         }
@@ -37,19 +37,19 @@ mod tests {
     fn should_create_session() {
         let mut session_service = SessionsImpl::default();
         assert_eq!(session_service.uuid_to_session.len(), 0);
-        let session = session_service.create_session("123456");
+        let session = session_service.create("123456");
         assert_eq!(session_service.uuid_to_session.len(), 1);
         assert_eq!(
-            session_service.uuid_to_session.get("123456").unwrap(),
-            &session
+            session_service.uuid_to_session.get("123456"),
+            Some(&session)
         );
     }
 
     #[test]
     fn should_delete_session() {
         let mut session_service = SessionsImpl::default();
-        session_service.create_session("123456");
-        session_service.delete_session("123456");
+        session_service.create("123456");
+        session_service.delete("123456");
         assert_eq!(session_service.uuid_to_session.len(), 0);
     }
 }
