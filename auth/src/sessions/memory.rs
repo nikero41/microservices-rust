@@ -20,15 +20,8 @@ impl SessionStore for MemorySessions {
     }
 
     fn delete(&mut self, session_token: &str) {
-        self.uuid_to_session = self
-            .uuid_to_session
-            .iter_mut()
-            .filter(|&(_, token)| token != session_token)
-            .collect();
-
-        // if let Some(&(user_uuid, _)) = result {
-        //     self.uuid_to_session.remove(user_uuid);
-        // }
+        self.uuid_to_session
+            .retain(|_, token| token != session_token)
     }
 }
 
