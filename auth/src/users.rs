@@ -64,8 +64,7 @@ impl Users for UsersImpl {
             .get(username)
             .ok_or(AuthError::InvalidCredentials)?;
 
-        let hashed_password = user.password.clone();
-        let parsed_hash = PasswordHash::new(&hashed_password)
+        let parsed_hash = PasswordHash::new(&user.password)
             .map_err(|e| AuthError::InternalError(e.to_string()))?;
 
         match Pbkdf2.verify_password(password.as_bytes(), &parsed_hash) {
