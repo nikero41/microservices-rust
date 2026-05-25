@@ -9,7 +9,7 @@ use std::collections::HashMap;
 
 pub trait Users {
     fn create_user(&mut self, username: String, password: String) -> Result<(), AuthError>;
-    fn get_user_uuid(&self, username: &str, password: &str) -> Result<String, AuthError>;
+    fn authenticate(&self, username: &str, password: &str) -> Result<String, AuthError>;
     fn delete_user(&mut self, user_uuid: String) -> Result<(), AuthError>;
 }
 
@@ -53,7 +53,7 @@ impl Users for UsersImpl {
         Ok(())
     }
 
-    fn get_user_uuid(&self, username: &str, password: &str) -> Result<String, AuthError> {
+    fn authenticate(&self, username: &str, password: &str) -> Result<String, AuthError> {
         let user = self
             .username_to_user
             .get(username)
@@ -116,7 +116,7 @@ mod tests {
             .create_user("username".to_owned(), "password".to_owned())
             .expect("should create user");
 
-        assert!(user_service.get_user_uuid("username", "password").is_ok());
+        assert!(user_service.authenticate("username", "password").is_ok());
     }
 
     #[test]
@@ -128,7 +128,7 @@ mod tests {
 
         assert!(
             user_service
-                .get_user_uuid("username", "incorrect password")
+                .authenticate("username", "incorrect password")
                 .is_err()
         );
     }
@@ -140,7 +140,7 @@ mod tests {
             .create_user("username".to_owned(), "password".to_owned())
             .expect("should create user");
 
-        let user_uuid = user_service.get_user_uuid("username", "password").unwrap();
+        let user_uuid = user_service.authenticate("username", "password").unwrap();
 
         user_service.delete_user(user_uuid);
 

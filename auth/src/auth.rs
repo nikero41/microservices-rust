@@ -49,7 +49,7 @@ impl Auth for AuthService {
             .users_service
             .lock()
             .unwrap()
-            .get_user_uuid(&request.username, &request.password);
+            .authenticate(&request.username, &request.password);
 
         match result {
             Ok(user_uuid) => {
@@ -80,7 +80,7 @@ impl Auth for AuthService {
             .users_service
             .lock()
             .unwrap()
-            .get_user_uuid(&request.username, &request.password);
+            .authenticate(&request.username, &request.password);
 
         let response = match result {
             Ok(_) => SignUpResponse {
