@@ -114,7 +114,7 @@ mod tests {
     }
 
     #[test]
-    fn should_retrieve_user_uuid() {
+    fn authenticate_should_succeed() {
         let mut user_service = UsersImpl::default();
         user_service
             .create_user("username".to_owned(), "password".to_owned())
@@ -124,7 +124,7 @@ mod tests {
     }
 
     #[test]
-    fn should_fail_to_retrieve_user_uuid_with_incorrect_password() {
+    fn authenticate_should_fail_with_incorrect_password() {
         let mut user_service = UsersImpl::default();
         user_service
             .create_user("username".to_owned(), "password".to_owned())
