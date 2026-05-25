@@ -1,5 +1,6 @@
 use std::sync::Mutex;
 
+use crate::errors::AuthError;
 use crate::{sessions::Sessions, users::Users};
 
 use tonic::{Request, Response, Status};
@@ -60,7 +61,7 @@ impl Auth for AuthService {
                     session_token,
                 }))
             }
-            None => Ok(Response::new(SignInResponse {
+            Err(_) => Ok(Response::new(SignInResponse {
                 status_code: StatusCode::Failure.into(),
                 ..Default::default()
             })),
@@ -81,16 +82,20 @@ impl Auth for AuthService {
             .unwrap()
             .get_user_uuid(&req.username, &req.password);
 
-        let res = match result {
-            Some(_) => SignUpResponse {
+        let response = match result {
+            Ok(_) => SignUpResponse {
                 status_code: StatusCode::Failure.into(),
             },
-            None => {
+            Err(_) => {
                 self.users_service
                     .lock()
                     .unwrap()
-                    .create_user(req.username.clone(), req.password.clone())
-                    .unwrap();
+                    .create_user(request.username.clone(), request.password.clone())
+                    .map_err(|e| match e {
+                        AuthError::InternalError(e) => Status::internal(e),
+                        AuthError::InvalidCredentials => Status::invalid_argument(e.to_string()),
+                        AuthError::UsernameAlreadyExists => Status::already_exists(e.to_string()),
+                    })?;
 
                 SignUpResponse {
                     status_code: StatusCode::Success.into(),

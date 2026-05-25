@@ -1,6 +1,7 @@
 use std::sync::Mutex;
 
 mod auth;
+mod errors;
 mod sessions;
 mod users;
 

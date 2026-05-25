@@ -1,3 +1,4 @@
+use crate::errors::AuthError;
 use pbkdf2::{
     Pbkdf2,
     password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString, rand_core::OsRng},
@@ -8,9 +9,9 @@ use uuid::Uuid;
 use std::collections::HashMap;
 
 pub trait Users {
-    fn create_user(&mut self, username: String, password: String) -> Result<(), String>;
-    fn get_user_uuid(&self, username: &str, password: &str) -> Option<String>;
-    fn delete_user(&mut self, user_uuid: String);
+    fn create_user(&mut self, username: String, password: String) -> Result<(), AuthError>;
+    fn get_user_uuid(&self, username: &str, password: &str) -> Result<String, AuthError>;
+    fn delete_user(&mut self, user_uuid: String) -> Option<()>;
 }
 
 #[derive(Clone)]
@@ -27,16 +28,16 @@ pub struct UsersImpl {
 }
 
 impl Users for UsersImpl {
-    fn create_user(&mut self, username: String, password: String) -> Result<(), String> {
+    fn create_user(&mut self, username: String, password: String) -> Result<(), AuthError> {
         if self.username_to_user.contains_key(&username) {
-            return Err("Username already exists".to_string());
+            return Err(AuthError::UsernameAlreadyExists);
         }
 
         let salt = SaltString::generate(&mut OsRng);
 
         let hashed_password = Pbkdf2
             .hash_password(password.as_bytes(), &salt)
-            .map_err(|e| format!("Failed to hash password.\n{e:?}"))?
+            .map_err(|e| AuthError::InternalError(e.to_string()))?
             .to_string();
 
         let user_uuid = Uuid::new_v4();
@@ -53,16 +54,20 @@ impl Users for UsersImpl {
         Ok(())
     }
 
-    fn get_user_uuid(&self, username: &str, password: &str) -> Option<String> {
-        let user = self.username_to_user.get(username)?;
+    fn get_user_uuid(&self, username: &str, password: &str) -> Result<String, AuthError> {
+        let user = self
+            .username_to_user
+            .get(username)
+            .ok_or(AuthError::InvalidCredentials)?;
 
         let hashed_password = user.password.clone();
-        let parsed_hash = PasswordHash::new(&hashed_password).ok()?;
+        let parsed_hash = PasswordHash::new(&hashed_password)
+            .map_err(|e| AuthError::InternalError(e.to_string()))?;
 
-        Pbkdf2
-            .verify_password(password.as_bytes(), &parsed_hash)
-            .ok()
-            .map(|_| user.user_uuid.clone())
+        match Pbkdf2.verify_password(password.as_bytes(), &parsed_hash) {
+            Ok(_) => Ok(user.user_uuid.clone()),
+            Err(_) => Err(AuthError::InvalidCredentials),
+        }
     }
 
     fn delete_user(&mut self, user_uuid: String) {
@@ -107,7 +112,7 @@ mod tests {
             .create_user("username".to_owned(), "password".to_owned())
             .expect("should create user");
 
-        assert!(user_service.get_user_uuid("username", "password").is_some());
+        assert!(user_service.get_user_uuid("username", "password").is_ok());
     }
 
     #[test]
@@ -120,7 +125,7 @@ mod tests {
         assert!(
             user_service
                 .get_user_uuid("username", "incorrect password")
-                .is_none()
+                .is_err()
         );
     }
 
