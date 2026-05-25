@@ -10,7 +10,7 @@ use std::collections::HashMap;
 pub trait Users {
     fn create_user(&mut self, username: String, password: String) -> Result<(), AuthError>;
     fn get_user_uuid(&self, username: &str, password: &str) -> Result<String, AuthError>;
-    fn delete_user(&mut self, user_uuid: String) -> Option<()>;
+    fn delete_user(&mut self, user_uuid: String) -> Result<(), AuthError>;
 }
 
 #[derive(Clone)]
@@ -69,10 +69,15 @@ impl Users for UsersImpl {
         }
     }
 
-    fn delete_user(&mut self, user_uuid: String) {
+    fn delete_user(&mut self, user_uuid: String) -> Result<(), AuthError> {
         let user = self.uuid_to_user.remove(&user_uuid);
         if let Some(user) = user {
-            self.username_to_user.remove(&user.username);
+            match self.username_to_user.remove(&user.username) {
+                Some(_) => Ok(()),
+                None => Err(AuthError::InvalidRequest),
+            }
+        } else {
+            Err(AuthError::InvalidRequest)
         }
     }
 }

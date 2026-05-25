@@ -8,4 +8,6 @@ pub enum AuthError {
     InternalError(String),
     #[error("Username already exists")]
     UsernameAlreadyExists,
+    #[error("Invalid request")]
+    InvalidRequest,
 }

@@ -95,6 +95,7 @@ impl Auth for AuthService {
                         AuthError::InternalError(e) => Status::internal(e),
                         AuthError::InvalidCredentials => Status::invalid_argument(e.to_string()),
                         AuthError::UsernameAlreadyExists => Status::already_exists(e.to_string()),
+                        AuthError::InvalidRequest => Status::invalid_argument(e.to_string()),
                     })?;
 
                 SignUpResponse {
