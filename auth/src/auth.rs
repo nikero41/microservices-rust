@@ -90,7 +90,7 @@ impl Auth for AuthService {
             .users_service
             .lock()
             .unwrap()
-            .create_user(request.username.clone(), request.password.clone());
+            .create_user(request.username, request.password);
 
         let response = match result {
             Ok(_) => SignUpResponse {
