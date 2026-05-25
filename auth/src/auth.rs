@@ -1,4 +1,4 @@
-use std::sync::Mutex;
+use tokio::sync::Mutex;
 
 use crate::errors::AuthError;
 use crate::{sessions::SessionStore, users::UserStore};
@@ -47,12 +47,12 @@ impl Auth for AuthService {
         let result = self
             .users_service
             .lock()
-            .unwrap()
+            .await
             .authenticate(&request.username, &request.password);
 
         match result {
             Ok(user_uuid) => {
-                let session_token = self.sessions_service.lock().unwrap().create(&user_uuid);
+                let session_token = self.sessions_service.lock().await.create(&user_uuid);
 
                 Ok(Response::new(SignInResponse {
                     status_code: StatusCode::Success.into(),
@@ -77,7 +77,7 @@ impl Auth for AuthService {
         let result = self
             .users_service
             .lock()
-            .unwrap()
+            .await
             .user_exists(&request.username);
 
         if result {
@@ -89,7 +89,7 @@ impl Auth for AuthService {
         let result = self
             .users_service
             .lock()
-            .unwrap()
+            .await
             .create_user(request.username, request.password);
 
         let response = match result {
@@ -117,7 +117,7 @@ impl Auth for AuthService {
 
         self.sessions_service
             .lock()
-            .unwrap()
+            .await
             .delete(&request.session_token);
 
         Ok(Response::new(SignOutResponse {
