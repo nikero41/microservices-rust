@@ -180,7 +180,9 @@ mod tests {
     async fn sign_in_should_succeed() {
         let mut users_service = MemoryUsers::default();
 
-        users_service.create_user("123456".to_owned(), "654321".to_owned()).expect("should create user");
+        users_service
+            .create_user("123456".to_owned(), "654321".to_owned())
+            .expect("should create user");
 
         let users_service = Box::new(Mutex::new(users_service));
         let sessions_service = Box::new(Mutex::new(MemorySessions::default()));
@@ -203,7 +205,9 @@ mod tests {
     async fn sign_up_should_fail_if_username_and_password_exists() {
         let mut users_service = MemoryUsers::default();
 
-        let _ = users_service.create_user("123456".to_owned(), "654321".to_owned());
+        users_service
+            .create_user("123456".to_owned(), "654321".to_owned())
+            .expect("should create user");
 
         let users_service = Box::new(Mutex::new(users_service));
         let sessions_service = Box::new(Mutex::new(MemorySessions::default()));
@@ -224,7 +228,9 @@ mod tests {
     async fn sign_up_should_fail_if_username_exists() {
         let mut users_service = MemoryUsers::default();
 
-        users_service.create_user("123456".to_owned(), "654321".to_owned()).expect("should create user");
+        users_service
+            .create_user("123456".to_owned(), "654321".to_owned())
+            .expect("should create user");
 
         let users_service = Box::new(Mutex::new(users_service));
         let sessions_service = Box::new(Mutex::new(MemorySessions::default()));
