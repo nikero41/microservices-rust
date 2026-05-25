@@ -109,13 +109,13 @@ impl Auth for AuthService {
         &self,
         request: Request<SignOutRequest>,
     ) -> Result<Response<SignOutResponse>, Status> {
-        let req = request.into_inner();
+        let request = request.into_inner();
         println!("SIGN-OUT");
 
         self.sessions_service
             .lock()
             .unwrap()
-            .delete(&req.session_token);
+            .delete(&request.session_token);
 
         Ok(Response::new(SignOutResponse {
             status_code: StatusCode::Success.into(),
