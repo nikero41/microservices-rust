@@ -201,7 +201,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn sign_up_should_fail_if_username_exists() {
+    async fn sign_up_should_fail_if_username_and_password_exists() {
         let mut users_service = UsersImpl::default();
 
         let _ = users_service.create_user("123456".to_owned(), "654321".to_owned());
@@ -214,6 +214,27 @@ mod tests {
         let request = tonic::Request::new(SignUpRequest {
             username: "123456".to_owned(),
             password: "654321".to_owned(),
+        });
+
+        let result = auth_service.sign_up(request).await.unwrap();
+
+        assert_eq!(result.into_inner().status_code, StatusCode::Failure.into());
+    }
+
+    #[tokio::test]
+    async fn sign_up_should_fail_if_username_exist() {
+        let mut users_service = UsersImpl::default();
+
+        let _ = users_service.create_user("123456".to_owned(), "654321".to_owned());
+
+        let users_service = Box::new(Mutex::new(users_service));
+        let sessions_service = Box::new(Mutex::new(SessionsImpl::default()));
+
+        let auth_service = AuthService::new(users_service, sessions_service);
+
+        let request = tonic::Request::new(SignUpRequest {
+            username: "123456".to_owned(),
+            password: "7654321".to_owned(),
         });
 
         let result = auth_service.sign_up(request).await.unwrap();
