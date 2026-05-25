@@ -78,34 +78,31 @@ impl Auth for AuthService {
             .users_service
             .lock()
             .unwrap()
-            .authenticate(&request.username, &request.password);
+            .user_exists(&request.username);
+
+        if result {
+            return Ok(Response::new(SignUpResponse {
+                status_code: StatusCode::Failure.into(),
+            }));
+        }
+
+        let result = self
+            .users_service
+            .lock()
+            .unwrap()
+            .create_user(request.username.clone(), request.password.clone());
 
         let response = match result {
             Ok(_) => SignUpResponse {
+                status_code: StatusCode::Success.into(),
+            },
+            Err(AuthError::UsernameAlreadyExists) => SignUpResponse {
                 status_code: StatusCode::Failure.into(),
             },
-            Err(_) => {
-                let result = self
-                    .users_service
-                    .lock()
-                    .unwrap()
-                    .create_user(request.username.clone(), request.password.clone());
-
-                match result {
-                    Ok(_) => SignUpResponse {
-                        status_code: StatusCode::Success.into(),
-                    },
-                    Err(AuthError::UsernameAlreadyExists) => SignUpResponse {
-                        status_code: StatusCode::Failure.into(),
-                    },
-                    Err(AuthError::InvalidCredentials | AuthError::InvalidRequest) => {
-                        SignUpResponse {
-                            status_code: StatusCode::Failure.into(),
-                        }
-                    }
-                    Err(AuthError::InternalError(e)) => return Err(Status::internal(e)),
-                }
-            }
+            Err(AuthError::InvalidCredentials | AuthError::InvalidRequest) => SignUpResponse {
+                status_code: StatusCode::Failure.into(),
+            },
+            Err(AuthError::InternalError(e)) => return Err(Status::internal(e)),
         };
 
         Ok(Response::new(response))

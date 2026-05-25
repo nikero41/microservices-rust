@@ -9,6 +9,7 @@ use std::collections::HashMap;
 
 pub trait Users {
     fn create_user(&mut self, username: String, password: String) -> Result<(), AuthError>;
+    fn user_exists(&self, username: &str) -> bool;
     fn authenticate(&self, username: &str, password: &str) -> Result<String, AuthError>;
     fn delete_user(&mut self, user_uuid: String) -> Result<(), AuthError>;
 }
@@ -51,6 +52,10 @@ impl Users for UsersImpl {
         self.uuid_to_user.insert(user_uuid.to_string(), user);
 
         Ok(())
+    }
+
+    fn user_exists(&self, username: &str) -> bool {
+        self.username_to_user.contains_key(username)
     }
 
     fn authenticate(&self, username: &str, password: &str) -> Result<String, AuthError> {
@@ -131,6 +136,21 @@ mod tests {
                 .authenticate("username", "incorrect password")
                 .is_err()
         );
+    }
+
+    #[test]
+    fn user_exists_should_return_true_if_username_exists() {
+        let mut user_service = UsersImpl::default();
+        user_service
+            .create_user("username".to_owned(), "password".to_owned())
+            .expect("should create user");
+        assert!(user_service.user_exists("username"));
+    }
+
+    #[test]
+    fn user_exists_should_return_false_if_username_does_not_exist() {
+        let user_service = UsersImpl::default();
+        assert!(!user_service.user_exists("missing-user"));
     }
 
     #[test]
