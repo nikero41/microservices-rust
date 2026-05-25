@@ -85,19 +85,25 @@ impl Auth for AuthService {
                 status_code: StatusCode::Failure.into(),
             },
             Err(_) => {
-                self.users_service
+                let result = self
+                    .users_service
                     .lock()
                     .unwrap()
-                    .create_user(request.username.clone(), request.password.clone())
-                    .map_err(|e| match e {
-                        AuthError::InternalError(e) => Status::internal(e),
-                        AuthError::InvalidCredentials => Status::invalid_argument(e.to_string()),
-                        AuthError::UsernameAlreadyExists => Status::already_exists(e.to_string()),
-                        AuthError::InvalidRequest => Status::invalid_argument(e.to_string()),
-                    })?;
+                    .create_user(request.username.clone(), request.password.clone());
 
-                SignUpResponse {
-                    status_code: StatusCode::Success.into(),
+                match result {
+                    Ok(_) => SignUpResponse {
+                        status_code: StatusCode::Success.into(),
+                    },
+                    Err(AuthError::UsernameAlreadyExists) => SignUpResponse {
+                        status_code: StatusCode::Failure.into(),
+                    },
+                    Err(AuthError::InvalidCredentials | AuthError::InvalidRequest) => {
+                        SignUpResponse {
+                            status_code: StatusCode::Failure.into(),
+                        }
+                    }
+                    Err(AuthError::InternalError(e)) => return Err(Status::internal(e)),
                 }
             }
         };
