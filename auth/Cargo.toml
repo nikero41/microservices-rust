@@ -11,6 +11,7 @@ tonic.workspace = true
 uuid.workspace = true
 pbkdf2.workspace = true
 tonic-prost.workspace = true
+thiserror.workspace = true
 
 [build-dependencies]
 tonic-prost-build.workspace = true
