@@ -1,7 +1,7 @@
 use std::sync::Mutex;
 
 use crate::errors::AuthError;
-use crate::{sessions::Sessions, users::Users};
+use crate::{sessions::SessionStore, users::UserStore};
 
 use tonic::{Request, Response, Status};
 
@@ -19,14 +19,14 @@ pub use authentication::auth_server::AuthServer;
 pub use tonic::transport::Server;
 
 pub struct AuthService {
-    users_service: Box<Mutex<dyn Users + Send + Sync>>,
-    sessions_service: Box<Mutex<dyn Sessions + Send + Sync>>,
+    users_service: Box<Mutex<dyn UserStore + Send + Sync>>,
+    sessions_service: Box<Mutex<dyn SessionStore + Send + Sync>>,
 }
 
 impl AuthService {
     pub fn new(
-        users_service: Box<Mutex<dyn Users + Send + Sync>>,
-        sessions_service: Box<Mutex<dyn Sessions + Send + Sync>>,
+        users_service: Box<Mutex<dyn UserStore + Send + Sync>>,
+        sessions_service: Box<Mutex<dyn SessionStore + Send + Sync>>,
     ) -> Self {
         Self {
             users_service,

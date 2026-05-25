@@ -2,14 +2,14 @@ use std::collections::HashMap;
 
 use uuid::Uuid;
 
-use crate::sessions::Sessions;
+use crate::sessions::SessionStore;
 
 #[derive(Default)]
 pub struct MemorySessions {
     uuid_to_session: HashMap<String, String>,
 }
 
-impl Sessions for MemorySessions {
+impl SessionStore for MemorySessions {
     fn create(&mut self, user_uuid: &str) -> String {
         let session = Uuid::new_v4();
 

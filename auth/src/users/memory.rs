@@ -1,4 +1,4 @@
-use crate::{errors::AuthError, users::Users};
+use crate::{errors::AuthError, users::UserStore};
 use pbkdf2::{
     Pbkdf2,
     password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString, rand_core::OsRng},
@@ -20,7 +20,7 @@ pub struct MemoryUsers {
     username_to_user: HashMap<String, User>,
 }
 
-impl Users for MemoryUsers {
+impl UserStore for MemoryUsers {
     fn create_user(&mut self, username: String, password: String) -> Result<(), AuthError> {
         if self.username_to_user.contains_key(&username) {
             return Err(AuthError::UsernameAlreadyExists);
