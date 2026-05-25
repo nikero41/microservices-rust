@@ -142,7 +142,7 @@ mod tests {
 
         let user_uuid = user_service.authenticate("username", "password").unwrap();
 
-        user_service.delete_user(user_uuid);
+        user_service.delete_user(user_uuid).unwrap();
 
         assert_eq!(user_service.uuid_to_user.len(), 0);
         assert_eq!(user_service.username_to_user.len(), 0);
