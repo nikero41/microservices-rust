@@ -155,7 +155,9 @@ mod tests {
     async fn sign_in_should_fail_if_incorrect_password() {
         let mut users_service = UsersImpl::default();
 
-        let _ = users_service.create_user("123456".to_owned(), "654321".to_owned());
+        users_service
+            .create_user("123456".to_owned(), "654321".to_owned())
+            .expect("should create user");
 
         let users_service = Box::new(Mutex::new(users_service));
         let sessions_service = Box::new(Mutex::new(SessionsImpl::default()));
@@ -178,7 +180,7 @@ mod tests {
     async fn sign_in_should_succeed() {
         let mut users_service = UsersImpl::default();
 
-        let _ = users_service.create_user("123456".to_owned(), "654321".to_owned());
+        users_service.create_user("123456".to_owned(), "654321".to_owned()).expect("should create user");
 
         let users_service = Box::new(Mutex::new(users_service));
         let sessions_service = Box::new(Mutex::new(SessionsImpl::default()));
@@ -222,7 +224,7 @@ mod tests {
     async fn sign_up_should_fail_if_username_exists() {
         let mut users_service = UsersImpl::default();
 
-        let _ = users_service.create_user("123456".to_owned(), "654321".to_owned());
+        users_service.create_user("123456".to_owned(), "654321".to_owned()).expect("should create user");
 
         let users_service = Box::new(Mutex::new(users_service));
         let sessions_service = Box::new(Mutex::new(SessionsImpl::default()));
