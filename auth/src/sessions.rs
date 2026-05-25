@@ -24,7 +24,7 @@ impl Sessions for SessionsImpl {
 
     fn delete(&mut self, user_uuid: &str) {
         if self.uuid_to_session.contains_key(user_uuid) {
-        self.uuid_to_session.remove(user_uuid);
+            self.uuid_to_session.remove(user_uuid);
         }
     }
 }

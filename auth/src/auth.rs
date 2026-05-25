@@ -43,13 +43,13 @@ impl Auth for AuthService {
     ) -> Result<Response<SignInResponse>, Status> {
         println!("Got a request: {:?}", request);
 
-        let req = request.into_inner();
+        let request = request.into_inner();
 
         let result = self
             .users_service
             .lock()
             .unwrap()
-            .get_user_uuid(&req.username, &req.password);
+            .get_user_uuid(&request.username, &request.password);
 
         match result {
             Ok(user_uuid) => {
@@ -74,13 +74,13 @@ impl Auth for AuthService {
     ) -> Result<Response<SignUpResponse>, Status> {
         println!("Got a request: {:?}", request);
 
-        let req = request.into_inner();
+        let request = request.into_inner();
 
         let result = self
             .users_service
             .lock()
             .unwrap()
-            .get_user_uuid(&req.username, &req.password);
+            .get_user_uuid(&request.username, &request.password);
 
         let response = match result {
             Ok(_) => SignUpResponse {
@@ -103,7 +103,7 @@ impl Auth for AuthService {
             }
         };
 
-        Ok(Response::new(res))
+        Ok(Response::new(response))
     }
 
     async fn sign_out(

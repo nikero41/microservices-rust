@@ -3,7 +3,6 @@ use pbkdf2::{
     Pbkdf2,
     password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString, rand_core::OsRng},
 };
-// use rand_core::OsRng;
 use uuid::Uuid;
 
 use std::collections::HashMap;
