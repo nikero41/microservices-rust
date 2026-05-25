@@ -103,7 +103,7 @@ mod tests {
 
         let result = user_service.create_user("username".to_owned(), "password".to_owned());
 
-        assert!(result.is_err());
+        matches!(result, Err(AuthError::UsernameAlreadyExists));
     }
 
     #[test]
@@ -123,11 +123,9 @@ mod tests {
             .create_user("username".to_owned(), "password".to_owned())
             .expect("should create user");
 
-        assert!(
-            user_service
-                .authenticate("username", "incorrect password")
-                .is_err()
-        );
+        let result = user_service.authenticate("username", "incorrect password");
+
+        matches!(result, Err(AuthError::InvalidCredentials));
     }
 
     #[test]
