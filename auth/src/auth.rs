@@ -222,7 +222,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn sign_up_should_fail_if_username_exist() {
+    async fn sign_up_should_fail_if_username_exists() {
         let mut users_service = UsersImpl::default();
 
         let _ = users_service.create_user("123456".to_owned(), "654321".to_owned());
